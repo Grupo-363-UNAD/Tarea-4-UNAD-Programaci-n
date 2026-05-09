@@ -1,18 +1,14 @@
-# =====================================================
-# IMPORTACION DE LIBRERIAS
-# =====================================================
+#Importar las librerias
 
 from abc import ABC, abstractmethod
 from datetime import datetime
 
 
-# =====================================================
-# FUNCION PARA REGISTRAR LOGS
-# =====================================================
+# Función para registrar eventos en un archivo de logs
 
 def registrar_log(mensaje):
 
-    # CREA Y GUARDA EVENTOS EN logs.txt
+    # Crear o abrir el archivo de logs en modo append
     with open("logs.txt", "a", encoding="utf-8") as archivo:
 
         archivo.write(
@@ -21,7 +17,7 @@ def registrar_log(mensaje):
 
 
 # =====================================================
-# EXCEPCIONES PERSONALIZADAS
+# Excepciones Personalizadas
 # =====================================================
 
 class ClienteError(Exception):
@@ -37,7 +33,7 @@ class ReservaError(Exception):
 
 
 # =====================================================
-# CLASE ABSTRACTA PERSONA
+# Clase abstracta Persona
 # =====================================================
 
 class Persona(ABC):
@@ -47,9 +43,8 @@ class Persona(ABC):
         pass
 
 
-# =====================================================
-# CLASE CLIENTE
-# =====================================================
+
+# Clase cliente 
 
 class Cliente(Persona):
 
@@ -57,21 +52,21 @@ class Cliente(Persona):
 
         try:
 
-            # VALIDAR NOMBRE
+            # Validar que el nombre no esté vacío
             if not nombre.strip():
 
                 raise ClienteError(
                     "El nombre no puede estar vacío"
                 )
 
-            # VALIDAR CORREO
+            # Validar correo electrónico básico
             if "@" not in correo:
 
                 raise ClienteError(
                     "Correo inválido"
                 )
 
-            # ATRIBUTOS PRIVADOS
+            # Atributos privados del cliente
             self.__nombre = nombre
             self.__correo = correo
 
@@ -83,7 +78,7 @@ class Cliente(Persona):
 
             raise
 
-    # MOSTRAR DATOS
+    # Mostrar datos del cliente
     def mostrar_datos(self):
 
         return (
@@ -91,14 +86,14 @@ class Cliente(Persona):
             f"{self.__nombre} - {self.__correo}"
         )
 
-    # OBTENER NOMBRE
+    # Obtener nombre del cliente
     def get_nombre(self):
 
         return self.__nombre
 
 
 # =====================================================
-# CLASE ABSTRACTA SERVICIO
+# Clase abstracta Servicio
 # =====================================================
 
 class Servicio(ABC):
@@ -117,9 +112,9 @@ class Servicio(ABC):
         pass
 
 
-# =====================================================
-# RESERVA DE SALAS
-# =====================================================
+
+# Reserva de las salas
+
 
 class ReservaSala(Servicio):
 
@@ -135,9 +130,9 @@ class ReservaSala(Servicio):
         )
 
 
-# =====================================================
-# ALQUILER DE EQUIPOS
-# =====================================================
+
+# Alquiler de los equipos
+
 
 class AlquilerEquipo(Servicio):
 
@@ -153,9 +148,9 @@ class AlquilerEquipo(Servicio):
         )
 
 
-# =====================================================
-# ASESORIA ESPECIALIZADA
-# =====================================================
+
+# Asesoría especializada para los clientes
+
 
 class AsesoriaEspecializada(Servicio):
 
@@ -171,9 +166,9 @@ class AsesoriaEspecializada(Servicio):
         )
 
 
-# =====================================================
-# CLASE RESERVA
-# =====================================================
+
+# Clase reserva que relaciona cliente, servicio y horas
+
 
 class Reserva:
 
@@ -202,7 +197,7 @@ class Reserva:
 
             raise
 
-    # CONFIRMAR RESERVA
+    # Confirmar reserva
     def confirmar(self):
 
         self.estado = "Confirmada"
@@ -211,7 +206,7 @@ class Reserva:
             "Reserva confirmada"
         )
 
-    # CANCELAR RESERVA
+    # Cancelar reserva
     def cancelar(self):
 
         self.estado = "Cancelada"
@@ -220,17 +215,17 @@ class Reserva:
             "Reserva cancelada"
         )
 
-    # PROCESAR RESERVA
+    # Procesasr reserva y mostrar resultados
     def procesar_reserva(self):
 
         try:
 
-            # CALCULAR COSTO
+            # Calcular costo del servicio
             costo = self.servicio.calcular_costo(
                 self.horas
             )
 
-            # MOSTRAR RESULTADOS
+            # Muestra resultados de la reserva
             print("\n===== RESERVA =====")
 
             print(
@@ -247,7 +242,7 @@ class Reserva:
 
             print("Estado:", self.estado)
 
-            # REGISTRAR EVENTO
+            # Regitrar evento de reserva procesada
             registrar_log(
                 f"Reserva procesada para "
                 f"{self.cliente.get_nombre()}"
@@ -262,18 +257,18 @@ class Reserva:
             print("Error:", e)
 
 
-# =====================================================
-# LISTAS DEL SISTEMA
-# =====================================================
+
+# Listar del sistema para clientes, servicios y reservas
+
 
 clientes = []
 servicios = []
 reservas = []
 
 
-# =====================================================
-# REGISTRO CLIENTE
-# =====================================================
+
+# Registrar cliente en el sistema
+
 
 while True:
 
@@ -281,23 +276,23 @@ while True:
 
         print("\n===== REGISTRO CLIENTE =====")
 
-        # SOLICITAR NOMBRE
+        # solicitar nombre del cliente
         nombre = input(
             "Ingrese nombre del cliente: "
         )
 
-        # SOLICITAR CORREO
+        # solicitar correo del cliente
         correo = input(
             "Ingrese correo del cliente: "
         )
 
-        # CREAR CLIENTE
+        # Crea el cliente con los datos ingresados
         cliente1 = Cliente(nombre, correo)
 
-        # GUARDAR CLIENTE
+        # Guarda el cliente en la lista de clientes
         clientes.append(cliente1)
 
-        # REGISTRAR EVENTO
+        # Registrar evento de cliente registrado
         registrar_log(
             f"Cliente registrado: {nombre}"
         )
@@ -322,9 +317,9 @@ while True:
         )
 
 
-# =====================================================
-# CREACION SERVICIO
-# =====================================================
+
+# Creacion del servicio en el sistema
+
 
 while True:
 
@@ -336,24 +331,24 @@ while True:
         print("2. Alquiler Equipos")
         print("3. Asesoria Especializada")
 
-        # OPCION SERVICIO
+        # Opcion del servicio a crear
         opcion = int(
             input("Seleccione servicio: ")
         )
 
-        # NOMBRE SERVICIO
+        # Nombre del servicio
         nombre_servicio = input(
             "Ingrese nombre del servicio: "
         )
 
-        # TARIFA SERVICIO
+        # Tarifa por hora del servicio
         tarifa = float(
             input(
                 "Ingrese tarifa por hora: "
             )
         )
 
-        # RESERVA SALA
+        # Reserva de salas
         if opcion == 1:
 
             servicio1 = ReservaSala(
@@ -361,7 +356,7 @@ while True:
                 tarifa
             )
 
-        # ALQUILER EQUIPOS
+        # Alquiler de equipos
         elif opcion == 2:
 
             servicio1 = AlquilerEquipo(
@@ -369,7 +364,7 @@ while True:
                 tarifa
             )
 
-        # ASESORIA
+        # Aswsoria especializada
         elif opcion == 3:
 
             servicio1 = (
@@ -388,7 +383,7 @@ while True:
         # GUARDAR SERVICIO
         servicios.append(servicio1)
 
-        # REGISTRAR EVENTO
+        # Registrar evento de servicio creado
         registrar_log(
             f"Servicio creado: "
             f"{nombre_servicio}"
@@ -414,9 +409,9 @@ while True:
         )
 
 
-# =====================================================
-# CREAR RESERVA
-# =====================================================
+
+# Creacion de reserva en el sistema
+
 
 while True:
 
@@ -424,39 +419,39 @@ while True:
 
         print("\n===== CREAR RESERVA =====")
 
-        # SOLICITAR HORAS
+        # Solicitar horas de reserva
         horas = int(
             input(
                 "Ingrese cantidad de horas: "
             )
         )
 
-        # CREAR RESERVA
+        # Crea reserva con el cliente, servicio y horas ingresados
         reserva1 = Reserva(
             cliente1,
             servicio1,
             horas
         )
 
-        # GUARDAR RESERVA
+        # Guardar reserva en la lista de reservas
         reservas.append(reserva1)
 
         print("\n1. Confirmar")
         print("2. Cancelar")
 
-        # ESTADO RESERVA
+        # Estado dereserva a confirmar o cancelar
         estado = int(
             input(
                 "Seleccione estado reserva: "
             )
         )
 
-        # CONFIRMAR
+        # Confirmar reserva
         if estado == 1:
 
             reserva1.confirmar()
 
-        # CANCELAR
+        # Cancelar reserva
         elif estado == 2:
 
             reserva1.cancelar()
@@ -465,7 +460,7 @@ while True:
 
             print("Opción inválida")
 
-        # PROCESAR RESERVA
+        # Procesar reserva y mostrar resultados
         reserva1.procesar_reserva()
 
         break
@@ -484,9 +479,9 @@ while True:
         )
 
 
-# =====================================================
-# MOSTRAR CLIENTES
-# =====================================================
+
+# Muestra clientes registrados en el sistema
+
 
 print("\n===== CLIENTES REGISTRADOS =====")
 
@@ -495,9 +490,8 @@ for cliente in clientes:
     print(cliente.mostrar_datos())
 
 
-# =====================================================
-# FINALIZACION SISTEMA
-# =====================================================
+
+# Finaliza el sistema y muestra mensaje de despedida
 
 registrar_log(
     "Sistema finalizado correctamente"

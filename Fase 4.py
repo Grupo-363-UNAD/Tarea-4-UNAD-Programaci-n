@@ -24,6 +24,10 @@ def registrar_log(mensaje):
 # ==========================================================
 # EXCEPCIONES PERSONALIZADAS
 # ==========================================================
+class EntidadBase(ABC):  #Agregue clase base - KG
+    @abstractmethod
+    def mostrar(self):
+        pass
 
 class ClienteError(Exception):
     pass
@@ -41,7 +45,8 @@ class ReservaError(Exception):
 # CLASE CLIENTE
 # ==========================================================
 
-class Cliente:
+class Cliente(EntidadBase):  #Hacemos que Cliente herede KG
+
 
     def __init__(self, nombre, documento, correo):
 
@@ -50,6 +55,8 @@ class Cliente:
         self.__correo = correo
 
         self.validar_datos()
+    
+    
 
     # ------------------------------------------------------
 
@@ -84,7 +91,11 @@ class Cliente:
         finally:
 
             print("Validación de cliente finalizada\n")
+        
 
+    def mostrar(self):  #Agregamos mostrar (self) para cumplir herencia abstracta KG
+        return self.mostrar_cliente()
+    
     # ------------------------------------------------------
     # GETTERS
     # ------------------------------------------------------

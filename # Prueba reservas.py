@@ -1,40 +1,49 @@
-# Prueba reservas 
-
-
+# ==========================================================
+# RESERVAS
+# ==========================================================
 
 print("\n========== RESERVAS ==========\n")
 
+# ---------------- RESERVA VÁLIDA ----------------
 try:
-    # 🔥 MEJORA: integración completa Cliente + Servicio + Reserva
+    # Integración completa Cliente + Servicio + Reserva
     # Demuestra relación entre clases (POO real)
-    r1 = Reserva(c1, servicios[0], 3)
+    r1 = Reserva(c1
+    , servicios[0], 3)
     r1.confirmar()
     sistema.agregar_reserva(r1)
+
+    print("\n--- RESERVA VÁLIDA ---")
     r1.mostrar()
-except:
-    pass
 
+except Exception as e:
+    registrar_log(str(e))
+    print(f"[ERROR CONTROLADO] {e}")
+
+
+# Separador visual (MEJORA CLARA)
+print("\n--- VALIDACIÓN DE RESERVAS INVÁLIDAS ---\n")
+
+
+# ---------------- RESERVA INVÁLIDA 1 ----------------
 try:
-    # 🔥 MEJORA: validación de límite superior de negocio
-    # (no más de 24 horas)
+    #Validación de límite superior de negocio
+    #(no más de 24 horas)
     r2 = Reserva(c1, servicios[1], 30)
-except:
-    # 🔥 MEJORA: manejo de error sin interrumpir el sistema
-    pass
 
+except Exception as e:
+    # Manejo de error sin interrumpir el sistema
+    registrar_log(str(e))
+    print(f"[ERROR CONTROLADO] {e}")
+
+
+# ---------------- RESERVA INVÁLIDA 2 ----------------
 try:
-    # 🔥 MEJORA: validación de datos negativos
+    # Validación de datos negativos
     r3 = Reserva(c1, servicios[2], -2)
-except:
-    pass
+except Exception as e:
+    registrar_log(str(e))
+    print(f"[ERROR CONTROLADO] {e}")
 
-
-# ==========================================================
-# CANCELACIÓN
-# ==========================================================
-
-# 🔥 MEJORA: cambio de estado de la reserva
-# Demuestra control de ciclo de vida del objeto
-r1.cancelar()
 
 print("\nSistema finalizado correctamente")

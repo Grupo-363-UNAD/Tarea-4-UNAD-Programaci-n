@@ -12,22 +12,26 @@ from abc import ABC, abstractmethod
 
 
 # ==========================================================
-# ARCHIVO DE LOGS
+# LOGS
 # ==========================================================
 
 def registrar_log(mensaje):
 
-    with open("logs.txt", "a", encoding="utf-8") as archivo:
-        archivo.write(mensaje + "\n")
+    try:
+        # Ahora el log es más seguro
+        # Antes podía fallar sin control
+
+        with open("logs.txt", "a", encoding="utf-8") as archivo:
+            archivo.write(mensaje + "\n")
+
+    except Exception as e:
+        # Manejo de fallo crítico de logs
+        print("Error crítico en logs:", e)
 
 
 # ==========================================================
 # EXCEPCIONES PERSONALIZADAS
 # ==========================================================
-class EntidadBase(ABC):  #Agregue clase base - KG
-    @abstractmethod
-    def mostrar(self):
-        pass
 
 class ClienteError(Exception):
     pass
@@ -42,63 +46,59 @@ class ReservaError(Exception):
 
 
 # ==========================================================
-# CLASE CLIENTE
+# CLASE BASE ABSTRACTA
 # ==========================================================
 
-class Cliente(EntidadBase):  #Hacemos que Cliente herede KG
+class EntidadBase(ABC):
 
+    @abstractmethod
+    def mostrar(self):
+        pass
+
+
+# ==========================================================
+# CLIENTE
+# ==========================================================
+
+class Cliente(EntidadBase):
 
     def __init__(self, nombre, documento, correo):
 
-        self.__nombre = nombre
-        self.__documento = documento
-        self.__correo = correo
+        #Cambie los atributos para que empiecen en None por que 
+        # primero validamos antes de asignar valores reales 
+        self.__nombre = None
+        self.__documento = None
+        self.__correo = None
 
-        self.validar_datos()
-    
-    
+        #Delege la validación a un método separado 
+        self.set_datos(nombre, documento, correo)
 
-    # ------------------------------------------------------
-
-    def validar_datos(self):
+    def set_datos(self, nombre, documento, correo):
 
         try:
 
-            if self.__nombre.strip() == "":
-                raise ClienteError(
-                    "El nombre no puede estar vacío"
-                )
+            #Se mejoran las validaciones antes de crear el objeto 
+            if not nombre or nombre.strip() == "":
+                raise ClienteError("Nombre inválido")
 
-            if not str(self.__documento).isdigit():
-                raise ClienteError(
-                    "El documento debe contener solo números"
-                )
+            if not str(documento).isdigit():
+                raise ClienteError("Documento inválido")
 
-            if "@" not in self.__correo or "." not in self.__correo:
-                raise ClienteError(
-                    "Correo electrónico inválido"
-                )
+            if "@" not in correo or "." not in correo:
+                raise ClienteError("Correo inválido")
+
+            #Cambie a solo asignar si todo es válido
+            self.__nombre = nombre
+            self.__documento = documento
+            self.__correo = correo
+
+            registrar_log(f"Cliente creado: {nombre}")
 
         except ClienteError as e:
-
-            print("Error:", e)
+            #Cambie para que ahora el error se registre y se propague antes solo
+            #se imprimia y el objeto seguia existiendo 
             registrar_log(str(e))
-
-        else:
-
-            print("Cliente registrado exitosamente")
-
-        finally:
-
-            print("Validación de cliente finalizada\n")
-        
-
-    def mostrar(self):  #Agregamos mostrar (self) para cumplir herencia abstracta KG
-        return self.mostrar_cliente()
-    
-    # ------------------------------------------------------
-    # GETTERS
-    # ------------------------------------------------------
+            raise
 
     def get_nombre(self):
         return self.__nombre
@@ -109,28 +109,23 @@ class Cliente(EntidadBase):  #Hacemos que Cliente herede KG
     def get_correo(self):
         return self.__correo
 
-    # ------------------------------------------------------
-
-    def mostrar_cliente(self):
-
-        print("----- CLIENTE -----")
-        print("Nombre:", self.__nombre)
-        print("Documento:", self.__documento)
-        print("Correo:", self.__correo)
+    def mostrar(self):
+        print("\n--- CLIENTE ---")
+        print(self.__nombre, self.__documento, self.__correo)
 
 
 # ==========================================================
-# CLASE ABSTRACTA SERVICIO
+# CLASE SERVICIO (ABSTRACTO)
 # ==========================================================
 
 class Servicio(ABC):
 
     def __init__(self, nombre, tarifa):
 
+        # Validación estricta en el constructor
+        # antes: el sistema podía crear objetos inválidos parcialmente
         if tarifa <= 0:
-            raise ServicioError(
-                "La tarifa debe ser mayor a cero"
-            )
+            raise ServicioError("Tarifa inválida")
 
         self.nombre = nombre
         self.tarifa = tarifa
@@ -139,27 +134,31 @@ class Servicio(ABC):
     def descripcion(self):
         pass
 
+    def calcular_coste(self, horas, impuesto=0, descuento=0):
+
+        total = horas * self.tarifa
+        total += total * impuesto
+        total -= total * descuento
+        return total
+
 
 # ==========================================================
-# HERENCIA Y POLIMORFISMO
+# SERVICIOS CONCRETOS (POLIMORFISMO)
 # ==========================================================
 
 class ReservaSala(Servicio):
-
     def descripcion(self):
-        return f"Reserva de Sala - Tarifa: ${self.tarifa}"
+        return f"Sala de reuniones - {self.nombre} - ${self.tarifa}"
 
 
 class AlquilerEquipos(Servicio):
-
     def descripcion(self):
-        return f"Alquiler de Equipos - Tarifa: ${self.tarifa}"
+        return f"Equipos - {self.nombre} - ${self.tarifa}"
 
 
 class Asesoria(Servicio):
-
     def descripcion(self):
-        return f"Asesoría Personalizada - Tarifa: ${self.tarifa}"
+        return f"Asesoría - {self.nombre} - ${self.tarifa}"
 
 
 # ==========================================================
@@ -171,185 +170,180 @@ class Reserva:
     def __init__(self, cliente, servicio, horas):
 
         try:
-
+             # Validación estricta antes de asignar atributos
             if horas <= 0:
-                raise ReservaError(
-                    "Las horas deben ser mayores a cero"
-                )
+                raise ReservaError("Horas inválidas")
 
             if horas > 24:
-                raise ReservaError(
-                    "No se permiten reservas mayores a 24 horas"
-                )
+                raise ReservaError("Máximo 24 horas")
 
             self.cliente = cliente
             self.servicio = servicio
             self.horas = horas
             self.estado = "Pendiente"
 
+            registrar_log("Reserva creada correctamente")
+
         except ReservaError as e:
-
-            print("Error:", e)
+            # Antes el error solo se imprimía
+            # Ahora se registra y se detiene correctamente la creación
             registrar_log(str(e))
-
-        else:
-
-            print("Reserva creada correctamente")
-
-        finally:
-
-            print("Proceso de reserva finalizado\n")
-
-    # ------------------------------------------------------
+            raise
 
     def confirmar(self):
-
         self.estado = "Confirmada"
 
-        print(
-            f"Reserva confirmada para "
-            f"{self.cliente.get_nombre()}"
-        )
-
-    # ------------------------------------------------------
-
     def cancelar(self):
-
         self.estado = "Cancelada"
 
-        print(
-            f"Reserva cancelada para "
-            f"{self.cliente.get_nombre()}"
-        )
-
-    # ------------------------------------------------------
-
     def calcular_total(self):
+        return self.servicio.calcular_coste(self.horas)
 
-        return self.horas * self.servicio.tarifa
-
-    # ------------------------------------------------------
-
-    def mostrar_reserva(self):
-
-        print("----- RESERVA -----")
+    def mostrar(self):
+        print("\n--- RESERVA ---")
         print("Cliente:", self.cliente.get_nombre())
         print("Servicio:", self.servicio.nombre)
         print("Horas:", self.horas)
         print("Estado:", self.estado)
-        print("Costo Total:", self.calcular_total())
+        print("Total:", self.calcular_total())
 
 
 # ==========================================================
-# LISTA DE SERVICIOS (POLIMORFISMO)
+# SISTEMA DE GESTIÓN
+# ==========================================================
+
+class SistemaGestion:
+
+    # Esta clase no estaba en el código original
+
+    # ✔ Sirve como "controlador central"
+    # ✔ Organiza clientes, servicios y reservas
+    # ✔ Evita código desordenado en el main
+
+    def __init__(self):
+        self.clientes = []
+        self.servicios = []
+        self.reservas = []
+
+    def agregar_cliente(self, cliente):
+        # Centraliza la gestión de clientes
+        self.clientes.append(cliente)
+
+    def agregar_servicio(self, servicio):
+        # Centraliza servicios disponibles
+        self.servicios.append(servicio)
+
+    def crear_reserva(self, reserva):
+        # Centraliza reservas
+        self.reservas.append(reserva)
+
+
+# ==========================================================
+# SERVICIOS DISPONIBLES
 # ==========================================================
 
 servicios = [
-
-    ReservaSala("Sala de Juntas", 50000),
+    ReservaSala("Sala A", 50000),
     AlquilerEquipos("Computadores", 30000),
-    Asesoria("Asesoría Técnica", 80000)
-
+    Asesoria("Consultoría TI", 80000)
 ]
 
 print("\n========== SERVICIOS DISPONIBLES ==========\n")
 
-for servicio in servicios:
-
-    print(servicio.descripcion())
-
-
-# ==========================================================
-# PRUEBAS DEL SISTEMA
-# ==========================================================
-
-print("\n========== PRUEBAS CLIENTES ==========\n")
-
-cliente1 = Cliente(
-    "Santiago",
-    "123456",
-    "santiago@gmail.com"
-)
-
-cliente2 = Cliente(
-    "",
-    "654321",
-    "correo@gmail.com"
-)
-
-cliente3 = Cliente(
-    "Carlos",
-    "ABC123",
-    "carlos@gmail.com"
-)
-
-cliente4 = Cliente(
-    "Laura",
-    "987654",
-    "lauragmail.com"
-)
+for s in servicios:
+    print(s.descripcion())
 
 
 # ==========================================================
-# PRUEBAS SERVICIOS
+# SISTEMA
 # ==========================================================
 
-print("\n========== PRUEBAS SERVICIOS ==========\n")
+sistema = SistemaGestion()
+
+
+# ==========================================================
+# PRUEBA CLIENTES
+# ==========================================================
+
+print("\n========== CLIENTES ==========\n")
 
 try:
+    # Validación dentro de la clase Cliente
+    # Si el cliente es inválido, se lanza excepción automáticamente
+    c1 = Cliente("Santiago", "123456", "santiago@gmail.com")
+    sistema.agregar_cliente(c1)
+    c1.mostrar()
 
-    servicio_error = ReservaSala(
-        "Sala VIP",
-        -5000
-    )
+except Exception as e:
+    # El sistema no se detiene por errores de datos
+    # Se permite continuar la ejecución (robustez del sistema)
 
-except ServicioError as e:
+    print(e)
 
-    print("Error:", e)
+try:
+    # Prueba de entrada inválida
+    # Permite demostrar manejo de excepciones
+    c2 = Cliente("", "ABC", "correo")
+
+except Exception as e:
+     # Captura controlada del error sin afectar el flujo
+    print(e)
+
+try:
+    c3 = Cliente("Laura", "987654", "laura@gmail.com")
+    sistema.agregar_cliente(c3)
+    c3.mostrar()
+except Exception as e:
+    print(e)
+
+
+# ==========================================================
+# RESERVAS
+# ==========================================================
+
+print("\n========== RESERVAS ==========\n")
+
+# ---------------- RESERVA VÁLIDA ----------------
+try:
+    # Integración completa Cliente + Servicio + Reserva
+    # Demuestra relación entre clases (POO real)
+    r1 = Reserva(c1
+    , servicios[0], 3)
+    r1.confirmar()
+    sistema.agregar_reserva(r1)
+
+    print("\n--- RESERVA VÁLIDA ---")
+    r1.mostrar()
+
+except Exception as e:
     registrar_log(str(e))
+    print(f"[ERROR CONTROLADO] {e}")
 
 
-# ==========================================================
-# PRUEBAS RESERVAS
-# ==========================================================
-
-print("\n========== PRUEBAS RESERVAS ==========\n")
-
-reserva1 = Reserva(
-    cliente1,
-    servicios[0],
-    3
-)
-
-reserva1.confirmar()
-
-reserva1.mostrar_reserva()
-
-print()
-
-reserva2 = Reserva(
-    cliente1,
-    servicios[1],
-    30
-)
-
-print()
-
-reserva3 = Reserva(
-    cliente1,
-    servicios[2],
-    -2
-)
-
-print()
-
-reserva1.cancelar()
+# Separador visual (MEJORA CLARA)
+print("\n--- VALIDACIÓN DE RESERVAS INVÁLIDAS ---\n")
 
 
-# ==========================================================
-# FIN DEL PROGRAMA
-# ==========================================================
+# ---------------- RESERVA INVÁLIDA 1 ----------------
+try:
+    #Validación de límite superior de negocio
+    #(no más de 24 horas)
+    r2 = Reserva(c1, servicios[1], 30)
+
+except Exception as e:
+    # Manejo de error sin interrumpir el sistema
+    registrar_log(str(e))
+    print(f"[ERROR CONTROLADO] {e}")
+
+
+# ---------------- RESERVA INVÁLIDA 2 ----------------
+try:
+    # Validación de datos negativos
+    r3 = Reserva(c1, servicios[2], -2)
+except Exception as e:
+    registrar_log(str(e))
+    print(f"[ERROR CONTROLADO] {e}")
+
 
 print("\nSistema finalizado correctamente")
-
 

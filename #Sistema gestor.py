@@ -1,4 +1,6 @@
-#Sistema gestor 
+# ==========================================================
+# CLASE SISTEMA DE GESTIÓN 
+# ==========================================================
 
 class SistemaGestion:
 
@@ -26,7 +28,7 @@ class SistemaGestion:
         self.reservas.append(reserva)
 
 # ==========================================================
-# SERVICIOS DISPONIBLES (POLIMORFISMO)
+# SERVICIOS DISPONIBLES
 # ==========================================================
 
 servicios = [
@@ -37,8 +39,6 @@ servicios = [
 
 print("\n========== SERVICIOS DISPONIBLES ==========\n")
 
-# Cada servicio implementa su propia versión de descripcion()
-# Esto permite extender el sistema sin modificar este bloque
 for s in servicios:
     print(s.descripcion())
 
@@ -47,7 +47,6 @@ for s in servicios:
 # SISTEMA
 # ==========================================================
 
-#creación de un objeto controlador del sistema
-# Antes el flujo era lineal sin organización
-# Ahora el sistema centraliza clientes, servicios y reservas
 sistema = SistemaGestion()
+
+

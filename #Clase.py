@@ -1,5 +1,3 @@
-#Clase
-
 # ==========================================================
 # Sistema Integral de Gestión de Clientes,
 # Servicios y Reservas
@@ -44,22 +42,27 @@ class ServicioError(Exception):
 
 
 class ReservaError(Exception):
+    pass
 
 
 # ==========================================================
 # CLASE BASE ABSTRACTA
 # ==========================================================
 
-    class EntidadBase(ABC):
+class EntidadBase(ABC):
 
-        @abstractmethod
-        def mostrar(self):
-            pass
+    @abstractmethod
+    def mostrar(self):
+        pass
 
+# ==========================================================
+# CLIENTE
+# ==========================================================
 
-    class Cliente(EntidadBase):
+class Cliente(EntidadBase):
 
-     def __init__(self, nombre, documento, correo):
+    def __init__(self, nombre, documento, correo):
+
         #Cambie los atributos para que empiecen en None por que 
         # primero validamos antes de asignar valores reales 
         self.__nombre = None
@@ -72,6 +75,7 @@ class ReservaError(Exception):
     def set_datos(self, nombre, documento, correo):
 
         try:
+
             #Se mejoran las validaciones antes de crear el objeto 
             if not nombre or nombre.strip() == "":
                 raise ClienteError("Nombre inválido")
@@ -94,4 +98,17 @@ class ReservaError(Exception):
             #Cambie para que ahora el error se registre y se propague antes solo
             #se imprimia y el objeto seguia existiendo 
             registrar_log(str(e))
-            raise  # 🔥 importante: no ocultar error
+            raise  # No ocultar error
+
+    def get_nombre(self):
+        return self.__nombre
+
+    def get_documento(self):
+        return self.__documento
+
+    def get_correo(self):
+        return self.__correo
+
+    def mostrar(self):
+        print("\n--- CLIENTE ---")
+        print(self.__nombre, self.__documento, self.__correo)

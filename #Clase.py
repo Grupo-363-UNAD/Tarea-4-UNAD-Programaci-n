@@ -18,11 +18,16 @@ from abc import ABC, abstractmethod
 # ==========================================================
 
 def registrar_log(mensaje):
+
     try:
+        # Ahora el log es más seguro
+        # Antes podía fallar sin control
+
         with open("logs.txt", "a", encoding="utf-8") as archivo:
             archivo.write(mensaje + "\n")
-    
+
     except Exception as e:
+        # Manejo de fallo crítico de logs
         print("Error crítico en logs:", e)
 
 

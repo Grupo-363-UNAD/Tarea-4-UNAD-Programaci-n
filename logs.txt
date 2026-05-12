@@ -1,9 +1,0 @@
-2026-05-08 23:43:48.263547 -> Error Cliente: El nombre no puede estar vacío
-2026-05-08 23:43:48.264587 -> Error Registro Cliente: El nombre no puede estar vacío
-2026-05-08 23:43:49.559567 -> Error Cliente: El nombre no puede estar vacío
-2026-05-08 23:43:49.560657 -> Error Registro Cliente: El nombre no puede estar vacío
-2026-05-08 23:43:56.179148 -> Cliente registrado: cla
-2026-05-08 23:44:01.562565 -> Servicio creado: 21
-2026-05-08 23:44:03.344087 -> Reserva confirmada
-2026-05-08 23:44:03.346844 -> Reserva procesada para cla
-2026-05-08 23:44:03.347704 -> Sistema finalizado correctamente
